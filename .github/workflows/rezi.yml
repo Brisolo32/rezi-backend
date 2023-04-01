@@ -1,5 +1,5 @@
 name: Create rezi.csv
-on: [commit]
+on: [push]
 
 jobs:
   rezi:
