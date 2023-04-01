@@ -1,11 +1,16 @@
 # Welcome to Rezi!
-#    ____             _ 
-#   / __ \___  ____  (_)
-#  / /_/ / _ \/_  / / / 
-# / _, _/  __/ / /_/ /  
+#     ____             _ 
+#    / __ \___  ____  (_)
+#   / /_/ / _ \/_  / / / 
+#  / _, _/  __/ / /_/ /  
 # /_/ |_|\___/ /___/_/   
 # Rezi was written in Python 3.8.10 on VSCode.
 # Please visit the github at https://github.com/Wamy-Dev/ReziWebsite
+# ==================================================================
+# This is an modified version of Rezi that only does the scraper bit
+# Completly removing the webserver from it so it can be read from a
+# Machine
+# ==================================================================
 
 from scrapy.crawler import CrawlerProcess
 from scrapy.utils.project import get_project_settings
@@ -17,11 +22,13 @@ import requests
 import os
 import time
 import json
-#input file
+
+# Input file
 file = requests.get("https://raw.githubusercontent.com/Wamy-Dev/ReziWebsite/main/input.json")
 with open("input.json", "w") as json_file:
 	json.dump(file.json(), json_file, indent=4)
-# scrapers
+
+# All the scrapers available
 from scraper.spiders.abandonware import AbandonwareSpider
 from scraper.spiders.archive import ArchiveSpider
 from scraper.spiders.fitgirlrepacks import FitgirlSpider
@@ -36,13 +43,9 @@ from scraper.spiders.steamrip import SteamripSpider
 from scraper.spiders.threedsroms import ThreeDSRomsSpider
 from scraper.spiders.xcinsp import XciNspSpider
 from scraper.spiders.playablearchive import ArchivePlayableSpider
-from scraper.spiders.nsw2u import Nsw2uSpider
-#time
-now=datetime.now()
-current_time = now.strftime("%H:%M:%S")
-print(f"Time started: {current_time}.")
-CRONMONITORING = config("CRONMONITORING")
-#scraper
+
+# Scraper part. Scrapes everything from these sources
+# and puts to an file called rezi.csv
 if os.path.exists("rezi.csv"):
   os.remove("rezi.csv")
 else:
@@ -62,24 +65,6 @@ crawler.crawl(SteamripSpider) # https://steamrip.com
 crawler.crawl(ThreeDSRomsSpider) # https://3dsroms.com
 crawler.crawl(XciNspSpider) # https://xcinsp.com
 crawler.crawl(ArchivePlayableSpider) # https://archive.org
-crawler.crawl(Nsw2uSpider) # https://nsw2u.com
-crawler.start()
-#meilisearch
-SEARCHCLIENT = config("SEARCHCLIENT")
-SEARCHCLIENTKEY = config("SEARCHCLIENTKEY")
-client = meilisearch.Client(SEARCHCLIENT, SEARCHCLIENTKEY)
-index = client.index('rezi')
-csvfile = open('rezi.csv', 'r')
-data = csvfile.read()
-index.delete_all_documents()
-time.sleep(5)
-index.add_documents_csv(data.encode('utf-8'))
-#finishing
-try:
-	now=datetime.now()
-	current_time = now.strftime("%H:%M:%S")
-	requests.post(CRONMONITORING, data=f'Time finished: {current_time}.')
-except requests.RequestException as e:
-	print("Ping failed: %s" % e)
-print("### Finished ###")
 
+# Starts this shit
+crawler.start()
