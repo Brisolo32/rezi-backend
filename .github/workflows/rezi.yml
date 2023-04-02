@@ -4,6 +4,8 @@ on: [push]
 jobs:
   rezi:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v3
       - name: Install deps and run main.py
@@ -28,6 +30,7 @@ jobs:
       - name: Create new release
         uses: ncipollo/release-action@v1.12.0
         with:
+          commit: main
           tag: rezi
           artifacts: rezi.csv
           body: Download the file to get the most recent deploy!
