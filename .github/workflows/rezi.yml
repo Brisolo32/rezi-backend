@@ -1,5 +1,7 @@
 name: Create rezi.csv
-on: [push]
+on:
+  schedule:
+    - cron: "0 0 * * *" # Every day at midnight
 
 jobs:
   rezi:
